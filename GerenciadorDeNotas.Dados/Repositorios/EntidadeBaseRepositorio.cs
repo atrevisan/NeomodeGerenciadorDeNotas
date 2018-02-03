@@ -27,6 +27,7 @@ namespace GerenciadorDeNotas.Dados.Repositorios
         {
             get
             {
+
                 return GetAll();
             }
         }
