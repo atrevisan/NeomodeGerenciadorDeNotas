@@ -33,6 +33,7 @@ namespace GerenciadorDeNotas.Dados.Repositorios
         }
         public virtual IQueryable<T> AllIncluding(params Expression<Func<T, object>>[] includeProperties)
         {
+
             IQueryable<T> query = _contexto.Set<T>();
             foreach (var includeProperty in includeProperties)
             {
