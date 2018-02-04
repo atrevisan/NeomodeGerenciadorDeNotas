@@ -9,7 +9,7 @@ namespace GerenciadorDeNotas.Entidades
 
         public string NomeCompleto { get; set; }
 
-        public Guid Matricula { get; set; }
+        public string Matricula { get; set; }
 
         public string Foto { get; set; }
 
@@ -17,7 +17,7 @@ namespace GerenciadorDeNotas.Entidades
 
         public string EMail { get; set; }
 
-        public int CidadeId { get; set; }
+        public int? CidadeId { get; set; }
 
         public virtual Cidade Cidade { get; set; }
 

@@ -25,24 +25,23 @@ namespace GerenciadorDeNotas.Dados.Migrations
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("CidadeId");
+                    b.Property<int?>("CidadeId");
 
                     b.Property<string>("EMail")
-                        .IsRequired()
                         .HasMaxLength(50);
 
                     b.Property<string>("Foto")
-                        .IsRequired()
                         .HasMaxLength(50);
 
-                    b.Property<Guid>("Matricula");
+                    b.Property<string>("Matricula")
+                        .IsRequired()
+                        .HasMaxLength(10);
 
                     b.Property<string>("NomeCompleto")
                         .IsRequired()
                         .HasMaxLength(50);
 
                     b.Property<string>("Telefone")
-                        .IsRequired()
                         .HasMaxLength(16);
 
                     b.HasKey("ID");
@@ -87,9 +86,8 @@ namespace GerenciadorDeNotas.Dados.Migrations
             modelBuilder.Entity("GerenciadorDeNotas.Entidades.Aluno", b =>
                 {
                     b.HasOne("GerenciadorDeNotas.Entidades.Cidade", "Cidade")
-                        .WithMany()
-                        .HasForeignKey("CidadeId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .WithMany("Alunos")
+                        .HasForeignKey("CidadeId");
                 });
 
             modelBuilder.Entity("GerenciadorDeNotas.Entidades.Avaliacao", b =>

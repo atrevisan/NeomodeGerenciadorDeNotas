@@ -29,12 +29,12 @@ namespace GerenciadorDeNotas.Dados.Migrations
                 {
                     ID = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    CidadeId = table.Column<int>(nullable: false),
-                    EMail = table.Column<string>(maxLength: 50, nullable: false),
-                    Foto = table.Column<string>(maxLength: 50, nullable: false),
-                    Matricula = table.Column<Guid>(nullable: false),
+                    CidadeId = table.Column<int>(nullable: true),
+                    EMail = table.Column<string>(maxLength: 50, nullable: true),
+                    Foto = table.Column<string>(maxLength: 50, nullable: true),
+                    Matricula = table.Column<string>(maxLength: 10, nullable: false),
                     NomeCompleto = table.Column<string>(maxLength: 50, nullable: false),
-                    Telefone = table.Column<string>(maxLength: 16, nullable: false)
+                    Telefone = table.Column<string>(maxLength: 16, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -44,7 +44,7 @@ namespace GerenciadorDeNotas.Dados.Migrations
                         column: x => x.CidadeId,
                         principalTable: "Cidade",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(

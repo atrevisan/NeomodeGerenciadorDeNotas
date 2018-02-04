@@ -1,4 +1,6 @@
 ﻿
+using System.Collections.Generic;
+
 namespace GerenciadorDeNotas.Entidades
 {
     public class Cidade : IEntidadeBase
@@ -9,5 +11,7 @@ namespace GerenciadorDeNotas.Entidades
         public string Nome { get; set; }
 
         public string UF { get; set; }
+
+        public virtual ICollection<Aluno> Alunos { get; set; }
     }
 }

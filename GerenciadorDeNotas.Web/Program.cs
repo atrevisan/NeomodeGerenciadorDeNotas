@@ -19,9 +19,7 @@ namespace GerenciadorDeNotas.Web
 
                 try
                 {
-
-
-                    SeedData.Initialize(services);
+                    services.Seed();
                 }
                 catch (Exception ex)
                 {

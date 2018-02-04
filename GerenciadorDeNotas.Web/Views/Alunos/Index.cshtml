@@ -1,0 +1,43 @@
+﻿@model IEnumerable<GerenciadorDeNotas.Web.Models.AlunoViewModel>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Alunos</h2>
+
+<p>
+    <a asp-action="Create">Criar Novo Aluno</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.NomeCompleto)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Matricula)
+                </th>
+                
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            
+            <td>
+                @Html.DisplayFor(modelItem => item.NomeCompleto)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Matricula)
+            </td>
+            
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.ID">Editar</a> |
+                <a asp-action="Delete" asp-route-id="@item.ID">Deletar</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
