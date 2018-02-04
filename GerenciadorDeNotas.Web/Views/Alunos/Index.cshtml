@@ -1,4 +1,4 @@
-﻿@model IEnumerable<GerenciadorDeNotas.Web.Models.AlunoViewModel>
+﻿@model GerenciadorDeNotas.Web.Models.IndexViewModel
 
 @{
     ViewData["Title"] = "Index";
@@ -12,32 +12,69 @@
 <table class="table">
     <thead>
         <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.NomeCompleto)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Matricula)
-                </th>
-                
+            <th>
+                @Html.DisplayNameFor(model => Model.Items.FirstOrDefault().NomeCompleto)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => Model.Items.FirstOrDefault().Matricula)
+            </th>
+
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            
-            <td>
-                @Html.DisplayFor(modelItem => item.NomeCompleto)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Matricula)
-            </td>
-            
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ID">Editar</a> |
-                <a asp-action="Delete" asp-route-id="@item.ID">Deletar</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model.Items)
+        {
+            <tr>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.NomeCompleto)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Matricula)
+                </td>
+
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.ID">Editar</a> |
+                    <a asp-action="Delete" asp-route-id="@item.ID">Deletar</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+
+
+<!-- pager -->
+@if (Model.Pager.EndPage > 1)
+{
+    <ul class="pagination">
+        @if (Model.Pager.CurrentPage > 1)
+        {
+        <li>
+            <a asp-controller="Alunos" asp-action="Index">Primeiro</a>
+        </li>
+        <li>
+            <a asp-controller="Alunos" asp-action="Index" asp-route-page="@(Model.Pager.CurrentPage - 1)">Anterior</a>
+        </li>
+        }
+
+        @for (var page = Model.Pager.StartPage; page <= Model.Pager.EndPage; page++)
+        {
+        <li class="@(page == Model.Pager.CurrentPage ? "active" : "")">
+ 
+            <a asp-controller="Alunos" asp-action="Index" asp-route-page="@(page)">@(page)</a>
+        </li>
+        }
+
+        @if (Model.Pager.CurrentPage < Model.Pager.TotalPages)
+        {
+        <li>
+            <a asp-controller="Alunos" asp-action="Index" asp-route-page="@(Model.Pager.CurrentPage + 1)">Proximo</a>
+
+        </li>
+        <li>
+            <a asp-controller="Alunos" asp-action="Index" asp-route-page="@(Model.Pager.TotalPages)">Ultimo</a>
+        </li>
+        }
+    </ul>
+}

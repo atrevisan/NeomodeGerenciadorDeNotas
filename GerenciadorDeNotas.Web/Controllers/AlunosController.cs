@@ -20,9 +20,17 @@ namespace GerenciadorDeNotas.Web.Controllers
         }
 
         // GET: Alunos
-        public ActionResult Index()
+        public ActionResult Index(int? page)
         {
-            List<Aluno> alunos = _repositorioAlunos.AllIncluding(a => a.Avaliacoes).ToList();
+
+            int totalAlunos = (from aluno in _repositorioAlunos.All
+                       select aluno).Count();
+
+            Pager pager = new Pager(totalAlunos, page);
+
+            IQueryable<Aluno> itens = _repositorioAlunos.AllIncluding(a => a.Avaliacoes);
+            List<Aluno> alunos = itens.OrderBy(a => a.NomeCompleto).Skip((pager.CurrentPage - 1) * pager.PageSize).Take(pager.PageSize).ToList();
+            
             List<AlunoViewModel> alunosVM = new List<AlunoViewModel>();
 
             foreach(Aluno aluno in alunos)
@@ -41,7 +49,13 @@ namespace GerenciadorDeNotas.Web.Controllers
                 alunosVM.Add(alunoVM);
             }
 
-            return View(alunosVM);
+            var viewModel = new IndexViewModel
+            {
+                Items = alunosVM,
+                Pager = pager
+            };
+
+            return View(viewModel);
         }
 
         // GET: Alunos/Details/5
