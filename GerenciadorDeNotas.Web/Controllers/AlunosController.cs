@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using GerenciadorDeNotas.Dados.Infraestrutura;
 using GerenciadorDeNotas.Dados.Repositorios;
 using GerenciadorDeNotas.Entidades;
 using GerenciadorDeNotas.Web.Models;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net.Http.Headers;
 
 namespace GerenciadorDeNotas.Web.Controllers
 {
@@ -15,11 +16,19 @@ namespace GerenciadorDeNotas.Web.Controllers
     {
         private readonly IEntidadeBaseRepositorio<Aluno> _repositorioAlunos;
         private readonly IEntidadeBaseRepositorio<Cidade> _repositorioCidades;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public AlunosController(IEntidadeBaseRepositorio<Aluno> repositorioAlunos, IEntidadeBaseRepositorio<Cidade> repositorioCidades)
+        private readonly IHostingEnvironment _environment;
+
+        public AlunosController(IEntidadeBaseRepositorio<Aluno> repositorioAlunos, 
+                                IEntidadeBaseRepositorio<Cidade> repositorioCidades,
+                                IUnitOfWork unitOfWork,
+                                IHostingEnvironment environment)
         {
             _repositorioAlunos = repositorioAlunos;
             _repositorioCidades = repositorioCidades;
+            _unitOfWork = unitOfWork;
+            _environment = environment;
         }
 
         // GET: Alunos
@@ -31,8 +40,9 @@ namespace GerenciadorDeNotas.Web.Controllers
 
             Pager pager = new Pager(totalAlunos, page);
 
-            IQueryable<Aluno> itens = _repositorioAlunos.AllIncluding(a => a.Avaliacoes);
-            List<Aluno> alunos = itens.OrderBy(a => a.NomeCompleto).Skip((pager.CurrentPage - 1) * pager.PageSize).Take(pager.PageSize).ToList();
+            IQueryable<Aluno> itens = _repositorioAlunos.All;
+            List<Aluno> alunos = itens.OrderBy(a => a.NomeCompleto)
+                    .Skip((pager.CurrentPage - 1) * pager.PageSize).Take(pager.PageSize).ToList();
             
             List<AlunoViewModel> alunosVM = new List<AlunoViewModel>();
 
@@ -42,12 +52,7 @@ namespace GerenciadorDeNotas.Web.Controllers
                 {
                     ID = aluno.ID,
                     NomeCompleto = aluno.NomeCompleto,
-                    Matricula = aluno.Matricula,
-                    Foto = aluno.Foto,
-                    Telefone = aluno.Telefone,
-                    EMail = aluno.EMail,
-                    CidadeId = aluno.CidadeId
-
+                  
                 };
                 alunosVM.Add(alunoVM);
             }
@@ -112,7 +117,7 @@ namespace GerenciadorDeNotas.Web.Controllers
                 Foto = aluno.Foto,
                 Telefone = aluno.Telefone,
                 EMail = aluno.EMail,
-                CidadeId = aluno.CidadeId
+                CidadeId = aluno.CidadeId != null ? aluno.CidadeId.ToString() : null
             };
 
             ViewBag.Cidades = _repositorioCidades.All;
@@ -123,18 +128,67 @@ namespace GerenciadorDeNotas.Web.Controllers
         // POST: Alunos/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(AlunoViewModel alunoVM)
         {
-            try
+            if (ModelState.IsValid)
             {
-                // TODO: Add update logic here
+                var files = HttpContext.Request.Form.Files;
+                bool fileUploaded = false;
+                foreach (var Image in files)
+                {
+                    if (Image != null && Image.Length > 0)
+                    {
 
-                return RedirectToAction(nameof(Index));
+                        var file = Image;
+                        var uploads = Path.Combine(_environment.WebRootPath, "uploads\\img\\alunos");
+
+                        if (file.Length > 0)
+                        {
+                            var fileName = ContentDispositionHeaderValue.Parse
+                                (file.ContentDisposition).FileName.Trim('"');
+
+                            System.Console.WriteLine(fileName);
+                            string fileNameWithPath = Path.Combine(uploads, file.FileName);
+                            using (var fileStream = new FileStream(fileNameWithPath, FileMode.Create))
+                            {
+                                file.CopyTo(fileStream);
+                                alunoVM.Foto = "~/uploads/img/alunos/" + file.FileName;
+                                fileUploaded = true;
+                            }
+                            
+                        }
+                    }
+                }
+
+                Aluno aluno = _repositorioAlunos.GetSingle(alunoVM.ID);
+
+                if (aluno != null)
+                {
+                    aluno.NomeCompleto = alunoVM.NomeCompleto;
+                    aluno.Matricula = alunoVM.Matricula;
+                    aluno.Foto = !string.IsNullOrEmpty(alunoVM.Foto) ? alunoVM.Foto : aluno.Foto;
+                    aluno.Telefone = alunoVM.Telefone;
+                    aluno.EMail = alunoVM.EMail;
+                    int cidadeId;
+                    aluno.CidadeId = int.TryParse(alunoVM.CidadeId, out cidadeId) ? (int?)cidadeId : null; 
+
+                    _repositorioAlunos.Edit(aluno);
+                    _unitOfWork.Commit();
+
+                    if (!fileUploaded)
+                        return RedirectToAction("Index");
+                    else
+                        return RedirectToAction("Edit", new { id = aluno.ID});
+                }
+                
             }
-            catch
+            else
             {
-                return View();
+                var errors = ModelState.Values.SelectMany(v => v.Errors);
             }
+
+            ViewBag.Cidades = _repositorioCidades.All;
+            return View(alunoVM);
         }
 
         // GET: Alunos/Delete/5

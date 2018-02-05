@@ -31,7 +31,7 @@ namespace GerenciadorDeNotas.Dados.Migrations
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     CidadeId = table.Column<int>(nullable: true),
                     EMail = table.Column<string>(maxLength: 50, nullable: true),
-                    Foto = table.Column<string>(maxLength: 50, nullable: true),
+                    Foto = table.Column<string>(nullable: true),
                     Matricula = table.Column<string>(maxLength: 10, nullable: false),
                     NomeCompleto = table.Column<string>(maxLength: 50, nullable: false),
                     Telefone = table.Column<string>(maxLength: 16, nullable: true)

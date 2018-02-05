@@ -28,7 +28,7 @@ namespace GerenciadorDeNotas.Web.Models
         public string EMail { get; set; }
 
         [Display(Name = "Cidade")]
-        public int? CidadeId { get; set; }
+        public string CidadeId { get; set; }
         
     }
 }

@@ -3,6 +3,7 @@ using GerenciadorDeNotas.Dados.Infraestrutura;
 using GerenciadorDeNotas.Dados.Repositorios;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,12 +12,14 @@ namespace GerenciadorDeNotas.Web
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IHostingEnvironment environment)
         {
             Configuration = configuration;
+            Environment = environment;
         }
 
         public IConfiguration Configuration { get; }
+        public IHostingEnvironment Environment { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -24,9 +27,11 @@ namespace GerenciadorDeNotas.Web
 
             services.AddMvc();
             services.AddDbContext<GerenciadorDeNotasContexto>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-            services.AddSingleton<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped(typeof(IEntidadeBaseRepositorio<>), typeof(EntidadeBaseRepositorio<>));
-            
+
+            services.AddSingleton<IHostingEnvironment>(Environment);
+
             // dotnet ef migrations add InitialMigration –s ../GerenciadorDeNotas.Web/
             // dotnet ef database update –s ../GerenciadorDeNotas.Web/
             // <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="2.0.0" />

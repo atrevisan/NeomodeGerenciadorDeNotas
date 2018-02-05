@@ -11,7 +11,7 @@ using System;
 namespace GerenciadorDeNotas.Dados.Migrations
 {
     [DbContext(typeof(GerenciadorDeNotasContexto))]
-    [Migration("20180204214602_InitialMigration")]
+    [Migration("20180205120343_InitialMigration")]
     partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,8 +31,7 @@ namespace GerenciadorDeNotas.Dados.Migrations
                     b.Property<string>("EMail")
                         .HasMaxLength(50);
 
-                    b.Property<string>("Foto")
-                        .HasMaxLength(50);
+                    b.Property<string>("Foto");
 
                     b.Property<string>("Matricula")
                         .IsRequired()

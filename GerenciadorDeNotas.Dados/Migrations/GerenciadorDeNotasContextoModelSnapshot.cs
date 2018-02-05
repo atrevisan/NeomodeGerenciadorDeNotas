@@ -30,8 +30,7 @@ namespace GerenciadorDeNotas.Dados.Migrations
                     b.Property<string>("EMail")
                         .HasMaxLength(50);
 
-                    b.Property<string>("Foto")
-                        .HasMaxLength(50);
+                    b.Property<string>("Foto");
 
                     b.Property<string>("Matricula")
                         .IsRequired()
