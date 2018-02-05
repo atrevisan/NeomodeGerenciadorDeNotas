@@ -16,17 +16,20 @@ namespace GerenciadorDeNotas.Web.Controllers
     {
         private readonly IEntidadeBaseRepositorio<Aluno> _repositorioAlunos;
         private readonly IEntidadeBaseRepositorio<Cidade> _repositorioCidades;
+        private readonly IEntidadeBaseRepositorio<Avaliacao> _repositorioAvaliacoes;
         private readonly IUnitOfWork _unitOfWork;
 
         private readonly IHostingEnvironment _environment;
 
         public AlunosController(IEntidadeBaseRepositorio<Aluno> repositorioAlunos, 
                                 IEntidadeBaseRepositorio<Cidade> repositorioCidades,
+                                IEntidadeBaseRepositorio<Avaliacao> repositorioAvaliacoes,
                                 IUnitOfWork unitOfWork,
                                 IHostingEnvironment environment)
         {
             _repositorioAlunos = repositorioAlunos;
             _repositorioCidades = repositorioCidades;
+            _repositorioAvaliacoes = repositorioAvaliacoes;
             _unitOfWork = unitOfWork;
             _environment = environment;
         }
@@ -67,9 +70,28 @@ namespace GerenciadorDeNotas.Web.Controllers
         }
 
         // GET: Alunos/Details/5
-        public ActionResult Details(int id)
+        public ActionResult Details(int? id)
         {
-            return View();
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            Aluno aluno = _repositorioAlunos.GetSingle((int)id);
+            if (aluno == null)
+            {
+                return NotFound();
+            }
+
+            AlunoViewModel alunoVM = new AlunoViewModel
+            {
+                ID = aluno.ID,
+                NomeCompleto = aluno.NomeCompleto,
+                Matricula = aluno.Matricula,
+                Avaliacoes = _repositorioAvaliacoes.All.Where(avaliacao => avaliacao.AlunoId == aluno.ID).OrderBy(a => a.ID).ToList()
+            };
+
+            return View(alunoVM);
         }
 
         // GET: Alunos/Create

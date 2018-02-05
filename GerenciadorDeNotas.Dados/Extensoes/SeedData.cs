@@ -45,6 +45,16 @@ namespace GerenciadorDeNotas.Dados.Extensoes
 
                     context.Set<Aluno>().AddRange(alunos);
                     context.SaveChanges();
+
+                    foreach(Aluno aluno in alunos)
+                    {
+                        for (int i = 0; i < 3; i++)
+                        {
+                            context.Set<Avaliacao>().Add(new Avaliacao { AlunoId = aluno.ID, Nota = MockData.RandomNumber.Next(0, 10)});
+                        }
+                    }
+
+                    context.SaveChanges();
                 }
 
                 

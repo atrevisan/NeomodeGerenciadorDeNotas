@@ -1,5 +1,9 @@
-﻿using System;
+﻿using GerenciadorDeNotas.Entidades;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace GerenciadorDeNotas.Web.Models
 {
@@ -29,6 +33,44 @@ namespace GerenciadorDeNotas.Web.Models
 
         [Display(Name = "Cidade")]
         public string CidadeId { get; set; }
-        
+
+        public List<Avaliacao> Avaliacoes { get; set; }
+
+        public decimal Media
+        {
+            get
+            {
+               return  Avaliacoes != null &&
+                       Avaliacoes.Any()
+                       ?
+                            Avaliacoes.Select(avaliacao => avaliacao.Nota).Sum() 
+                       : 0;
+            }
+            set { }
+        }
+
+        public bool Aprovado
+        {
+
+            get
+            {
+
+                return Media > 28;
+            }
+
+            set { }
+        }
+
+        public bool Reprovado
+        {
+            get
+            {
+                return Media + (Avaliacoes != null && Avaliacoes.Any() ? (4 - Avaliacoes.Count) : 4) * 10 < 28;
+            }
+
+            set { }
+        }
+
+
     }
 }

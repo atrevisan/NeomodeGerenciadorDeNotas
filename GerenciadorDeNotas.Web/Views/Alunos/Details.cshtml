@@ -1,0 +1,87 @@
+﻿@model GerenciadorDeNotas.Web.Models.AlunoViewModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+@if (Model.Aprovado)
+{
+    <h2>Aluno Aprovado!</h2>
+}
+else if (Model.Reprovado)
+{
+    <h2>Aluno Reprovado!</h2>
+}
+
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+
+        <dt>
+            @Html.DisplayNameFor(model => model.NomeCompleto)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.NomeCompleto)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Matricula)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Matricula)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Media)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Media)
+        </dd>
+
+    </dl>
+</div>
+
+@if (Model.Avaliacoes != null && Model.Avaliacoes.Any())
+{
+
+    <p>Notas das Avaliações</p>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayName("Avaliação")
+                </th>
+                <th>
+                    @Html.DisplayName("Nota")
+                </th>
+
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Avaliacoes.Count; i++)
+            {
+                <tr>
+
+                    <td>
+                        <text>
+                            @(i + 1)
+                        </text>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => Model.Avaliacoes[i].Nota)
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Nenhuma avaliação ainda</p>
+}
+
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.ID">Editar</a> |
+    <a asp-action="Index">Voltar</a>
+</div>
