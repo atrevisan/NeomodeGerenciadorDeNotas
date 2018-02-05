@@ -7,16 +7,19 @@ using GerenciadorDeNotas.Entidades;
 using GerenciadorDeNotas.Web.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace GerenciadorDeNotas.Web.Controllers
 {
     public class AlunosController : Controller
     {
         private readonly IEntidadeBaseRepositorio<Aluno> _repositorioAlunos;
+        private readonly IEntidadeBaseRepositorio<Cidade> _repositorioCidades;
 
-        public AlunosController(IEntidadeBaseRepositorio<Aluno> repositorioAlunos)
+        public AlunosController(IEntidadeBaseRepositorio<Aluno> repositorioAlunos, IEntidadeBaseRepositorio<Cidade> repositorioCidades)
         {
             _repositorioAlunos = repositorioAlunos;
+            _repositorioCidades = repositorioCidades;
         }
 
         // GET: Alunos
@@ -86,11 +89,35 @@ namespace GerenciadorDeNotas.Web.Controllers
                 return View();
             }
         }
-
+        
         // GET: Alunos/Edit/5
-        public ActionResult Edit(int id)
+        public ActionResult Edit(int? id)
         {
-            return View();
+            if (id == null)
+            {
+                return NotFound();
+            }
+            
+            Aluno aluno = _repositorioAlunos.GetSingle((int)id);
+            if (aluno == null)
+            {
+                return NotFound();
+            }
+
+            AlunoViewModel alunoVM = new AlunoViewModel
+            {
+                ID = aluno.ID,
+                NomeCompleto = aluno.NomeCompleto,
+                Matricula = aluno.Matricula,
+                Foto = aluno.Foto,
+                Telefone = aluno.Telefone,
+                EMail = aluno.EMail,
+                CidadeId = aluno.CidadeId
+            };
+
+            ViewBag.Cidades = _repositorioCidades.All;
+
+            return View(alunoVM);
         }
 
         // POST: Alunos/Edit/5
