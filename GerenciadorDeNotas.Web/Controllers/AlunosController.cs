@@ -94,28 +94,6 @@ namespace GerenciadorDeNotas.Web.Controllers
             return View(alunoVM);
         }
 
-        // GET: Alunos/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Alunos/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
-        {
-            try
-            {
-                // TODO: Add insert logic here
-
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
         
         // GET: Alunos/Edit/5
         public ActionResult Edit(int? id)
@@ -154,45 +132,13 @@ namespace GerenciadorDeNotas.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var files = HttpContext.Request.Form.Files;
-                bool fileUploaded = false;
-                foreach (var Image in files)
-                {
-                    if (Image != null && Image.Length > 0)
-                    {
-
-                        var file = Image;
-                        var uploads = Path.Combine(_environment.WebRootPath, "uploads\\img\\alunos");
-
-                        if (file.Length > 0)
-                        {
-                            var fileName = ContentDispositionHeaderValue.Parse
-                                (file.ContentDisposition).FileName.Trim('"');
-
-                            System.Console.WriteLine(fileName);
-                            string fileNameWithPath = Path.Combine(uploads, file.FileName);
-                            using (var fileStream = new FileStream(fileNameWithPath, FileMode.Create))
-                            {
-                                file.CopyTo(fileStream);
-                                alunoVM.Foto = "~/uploads/img/alunos/" + file.FileName;
-                                fileUploaded = true;
-                            }
-                            
-                        }
-                    }
-                }
+                bool fileUploaded = CarregarArquivo(alunoVM);
 
                 Aluno aluno = _repositorioAlunos.GetSingle(alunoVM.ID);
 
                 if (aluno != null)
                 {
-                    aluno.NomeCompleto = alunoVM.NomeCompleto;
-                    aluno.Matricula = alunoVM.Matricula;
-                    aluno.Foto = !string.IsNullOrEmpty(alunoVM.Foto) ? alunoVM.Foto : aluno.Foto;
-                    aluno.Telefone = alunoVM.Telefone;
-                    aluno.EMail = alunoVM.EMail;
-                    int cidadeId;
-                    aluno.CidadeId = int.TryParse(alunoVM.CidadeId, out cidadeId) ? (int?)cidadeId : null; 
+                    alunoVM.PupularAluno(aluno);
 
                     _repositorioAlunos.Edit(aluno);
                     _unitOfWork.Commit();
@@ -200,9 +146,11 @@ namespace GerenciadorDeNotas.Web.Controllers
                     if (!fileUploaded)
                         return RedirectToAction("Index");
                     else
-                        return RedirectToAction("Edit", new { id = aluno.ID});
+                    {
+                        ViewBag.Cidades = _repositorioCidades.All;
+                        return View(alunoVM);
+                    }
                 }
-                
             }
             else
             {
@@ -213,27 +161,38 @@ namespace GerenciadorDeNotas.Web.Controllers
             return View(alunoVM);
         }
 
-        // GET: Alunos/Delete/5
-        public ActionResult Delete(int id)
+        private bool CarregarArquivo(AlunoViewModel alunoVM)
         {
-            return View();
-        }
-
-        // POST: Alunos/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
+            var files = HttpContext.Request.Form.Files;
+            bool fileUploaded = false;
+            foreach (var Image in files)
             {
-                // TODO: Add delete logic here
+                if (Image != null && Image.Length > 0)
+                {
 
-                return RedirectToAction(nameof(Index));
+                    var file = Image;
+                    var uploads = Path.Combine(_environment.WebRootPath, "uploads\\img\\alunos");
+
+                    if (file.Length > 0)
+                    {
+                        var fileName = ContentDispositionHeaderValue.Parse
+                            (file.ContentDisposition).FileName.Trim('"');
+
+                        System.Console.WriteLine(fileName);
+                        string fileNameWithPath = Path.Combine(uploads, file.FileName);
+                        using (var fileStream = new FileStream(fileNameWithPath, FileMode.Create))
+                        {
+                            file.CopyTo(fileStream);
+                            alunoVM.Foto = "~/uploads/img/alunos/" + file.FileName;
+                            fileUploaded = true;
+                        }
+
+                    }
+                }
             }
-            catch
-            {
-                return View();
-            }
+
+            return fileUploaded;
         }
+        
     }
 }

@@ -71,6 +71,16 @@ namespace GerenciadorDeNotas.Web.Models
             set { }
         }
 
+        public void PupularAluno(Aluno aluno)
+        {
+            aluno.NomeCompleto = NomeCompleto;
+            aluno.Matricula = Matricula;
+            aluno.Foto = !string.IsNullOrEmpty(Foto) ? Foto : aluno.Foto;
+            aluno.Telefone = Telefone;
+            aluno.EMail = EMail;
+            int cidadeId;
+            aluno.CidadeId = int.TryParse(CidadeId, out cidadeId) ? (int?)cidadeId : null;
+        }
 
     }
 }
